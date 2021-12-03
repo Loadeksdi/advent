@@ -1,5 +1,5 @@
 var fs = require('fs');
-var binaryValues = fs.readFileSync('input.txt').toString().split("\n");
+var binaryValues = fs.readFileSync('testinput.txt').toString().split("\n");
 
 let gamma = "";
 const globalArray = [];
@@ -48,9 +48,34 @@ gamma.split("").forEach(char => {
 });
 
 epsilon = epsilonArray.join("");
-console.log(gamma, epsilon);
 let gammaValue = parseInt(gamma, 2);
 let epsilonValue = parseInt(epsilon, 2);
 console.log(gammaValue * epsilonValue);
+
+function findO2() {
+    for (let i = 0; i < globalArray.length; i++) {
+        const indexes = [];
+        let mostCommon = mode(globalArray[i]);
+        globalArray[i].forEach((element, index) => {
+            if (element === mostCommon) {
+                indexes.push(index);
+            }
+        });
+        for (let j = indexes.length - 1; j >= 0; j--) {
+            globalArray[i].splice(indexes[j], 1);
+        }
+    }
+    let k = 0;
+    let O2 = "";
+    while (globalArray[k].length > 1){
+        O2 = O2.concat(globalArray[k][0]);
+        k++;
+    }
+    return O2;
+}
+
+console.log(findO2());
+
+
 
 
