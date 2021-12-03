@@ -51,7 +51,6 @@ epsilon = epsilonArray.join("");
 console.log(gamma, epsilon);
 let gammaValue = parseInt(gamma, 2);
 let epsilonValue = parseInt(epsilon, 2);
-
 console.log(gammaValue * epsilonValue);
 
 
