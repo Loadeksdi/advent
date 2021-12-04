@@ -1,81 +1,77 @@
-var fs = require('fs');
-var binaryValues = fs.readFileSync('testinput.txt').toString().split("\n");
+const fs = require('fs')
+const binaryValues = fs
+    .readFileSync('input.txt')
+    .toString()
+    .split('\n')
 
-let gamma = "";
-const globalArray = [];
-for (let i = 0; i < binaryValues[0].length; i++) {
-    globalArray.push([]);
-}
+const mostValuesInArray = (array, priority) => {
+    let zeroCount = 0
+    let oneCount = 0
 
-binaryValues.forEach(bv => {
-    for (let i = 0; i < bv.length; i++) {
-        globalArray[i].push(bv.charAt(i))
-    }
-});
+    array.forEach((value) => (value === '0' ? zeroCount++ : oneCount++))
 
-//Copied from StackOverflow
-function mode(array) {
-    if (array.length == 0)
-        return null;
-    var modeMap = {};
-    var maxEl = array[0], maxCount = 1;
-    for (var i = 0; i < array.length; i++) {
-        var el = array[i];
-        if (modeMap[el] == null)
-            modeMap[el] = 1;
-        else
-            modeMap[el]++;
-        if (modeMap[el] > maxCount) {
-            maxEl = el;
-            maxCount = modeMap[el];
+    if (zeroCount === oneCount) {
+        const ret = priority === '0' ? '0' : '1'
+        return ret
+    } else {
+        if (priority === '0') {
+            const ret = zeroCount < oneCount ? '0' : '1'
+            return ret
         }
+        const ret = zeroCount > oneCount ? '0' : '1'
+        return ret
     }
-    return maxEl;
 }
 
-for (let i = 0; i < globalArray.length; i++) {
-    gamma = gamma.concat(mode(globalArray[i]));
-}
+const findRating = (diagReport, bitCriteria) => {
+    let i = 0
+    let stop = false
 
-let epsilonArray = [];
-gamma.split("").forEach(char => {
-    if (char == "0") {
-        epsilonArray.push("1");
-    }
-    else {
-        epsilonArray.push("0");
-    }
-});
+    while (!stop) {
+        const indexes = []
+        const commonness = mostValuesInArray(diagReport[i], bitCriteria)
 
-epsilon = epsilonArray.join("");
-let gammaValue = parseInt(gamma, 2);
-let epsilonValue = parseInt(epsilon, 2);
-console.log(gammaValue * epsilonValue);
-
-function findO2() {
-    for (let i = 0; i < globalArray.length; i++) {
-        const indexes = [];
-        let mostCommon = mode(globalArray[i]);
-        globalArray[i].forEach((element, index) => {
-            if (element === mostCommon) {
-                indexes.push(index);
+        diagReport[i].forEach((element, index) => {
+            if (element !== commonness) {
+                indexes.push(index)
             }
-        });
+        })
+
         for (let j = indexes.length - 1; j >= 0; j--) {
-            globalArray[i].splice(indexes[j], 1);
+            diagReport.forEach((arr) => {
+                arr.splice(indexes[j], 1)
+            })
         }
+
+        if (!diagReport[i + 1] || diagReport[i + 1].length === 1) stop = true
+
+        i++
     }
-    let k = 0;
-    let O2 = "";
-    while (globalArray[k].length > 1){
-        O2 = O2.concat(globalArray[k][0]);
-        k++;
-    }
-    return O2;
+
+    const result = diagReport.map((elem) => elem[0]).join('')
+
+    return parseInt(result, 2)
 }
 
-console.log(findO2());
+const app = () => {
+    const values = Array.from(
+        { length: binaryValues[0].length },
+        () => new Array()
+    )
 
+    values.forEach((elem, i) => {
+        binaryValues.forEach((binaryValue) => {
+            elem.push(binaryValue[i])
+        })
+    })
 
+    const O2Values = JSON.parse(JSON.stringify(values))
+    const CO2Values = JSON.parse(JSON.stringify(values))
 
+    const O2 = findRating(O2Values, '1')
+    const CO2 = findRating(CO2Values, '0')
 
+    return O2 * CO2
+}
+
+console.log(app())
