@@ -8,14 +8,7 @@ const lineReader = require('readline').createInterface({
 });
 
 const checkRowsOfBingo = (bingo) => {
-    for (let i = 0; i < bingo.length; i++) {
-        for (let j = 0; j < bingo[i].length; j++) {
-            if (!bingo[i][j].marked) break
-
-            if (j === bingo[i].length - 1 && bingo[i][j].marked) return true
-        }
-    }
-    return false;
+    return bingo.some(line => line.every(valueObject => valueObject.marked));
 }
 
 const checkColsOfBingo = (bingo) => {
@@ -38,7 +31,7 @@ const calculateScore = (bingo, value) => {
             }
         })
     })
-    return sum * value;
+    return sum * Number(value);
 };
 
 lineReader.on('line', function (line) {
@@ -53,48 +46,31 @@ lineReader.on('line', function (line) {
     }
 }).on("close", () => {
     let bingoLines = [];
+    const scores = [];
     bingoInput.forEach(input => {
         bingoLines.push(input);
         if (bingoLines.length === 5) {
-            bingoTables.push(bingoLines);
+            bingoTables.push({ bingoLines, won: false });
             bingoLines = [];
         }
     });
-    /**
-     * bingoValues.forEach(value => {
+    bingoValues.forEach(value => {
         bingoTables.forEach((bingo, bingoIndex) => {
-            bingo.forEach(line => {
+            if (value === "12") {
+                console.log("heho");
+            }
+            bingo.bingoLines.forEach(line => {
                 line.forEach(valueObject => {
-                    if (bingoTables.length === 1) {
-                        console.log(calculateScore(bingoTables[0],valueObject.value));
-                        process.exit(-1);
-                    }
                     if (valueObject.value === value) {
                         valueObject.marked = true;
-                        if (checkRowsOfBingo(bingo) || checkColsOfBingo(bingo)) {
-                            bingoTables.splice(bingoIndex, 1);
-                        };
-                    }
-                })
+                    };
+                });
             });
+            if (!bingo.won && (checkRowsOfBingo(bingo.bingoLines) || checkColsOfBingo(bingo.bingoLines))) {
+                bingo.won = true;
+                scores.push(calculateScore(bingo.bingoLines, value));
+            }
         });
     });
-     */
-    
-    for (let a = 0; a < bingoValues.length; a++){
-        for (let b = bingoValues[a].length - 1; b >= 0; b--){
-            for (let c = bingoTables[b].length - 1; c >= 0; c--){
-                if (bingoTables.length === 1) {
-                    console.log(calculateScore(bingoTables[0],valueObject.value));
-                    process.exit(-1);
-                }
-                if (bingoTables[b][c].value === bingoValues[a]) {
-                    bingoTables[b][c].marked = true;
-                    if (checkRowsOfBingo(bingoTables[b]) || checkColsOfBingo(bingoTables[b])) {
-                        bingoTables.splice(b, 1);
-                    };
-                }
-            }
-        }
-    }
+    console.log(scores[0], scores.at(-1));
 });
