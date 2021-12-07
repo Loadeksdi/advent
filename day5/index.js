@@ -1,8 +1,22 @@
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('day5/test.txt')
+    input: require('fs').createReadStream('day5/input.txt')
 });
 
 const entries = [];
+const range = (a, b) => {
+    const res = [];
+    if (a < b) {
+        for (let i = a; i <= b; i++) {
+            res.push(i);
+        }
+    }
+    else {
+        for (let i = a; i >= b; i--) {
+            res.push(i);
+        }
+    }
+    return res;
+};
 
 lineReader.on('line', function (line) {
     const coordinates = line.split(' -> ');
@@ -49,39 +63,17 @@ lineReader.on('line', function (line) {
             }
         }
         else {
-            let maxX = (entries[i].x - entries[i + 1].x > 0) ? entries[i].x : entries[i + 1].x;
-            let maxY = (entries[i].y - entries[i + 1].y > 0) ? entries[i].y : entries[i + 1].y;
-            if (entries[i].x === entries[i].y && entries[i + 1].x == entries[i + 1].y) {
-                for (maxX; maxX >= Math.min(entries[i].x, entries[i + 1].x); maxX--) {
-                    for (maxY; maxY >= Math.min(entries[i].y, entries[i + 1].y); maxY--) {
-                        let vent = vents.find(vent => vent.x === maxX && vent.y === maxY);
-                        if (vent) {
-                            vent.value++
-                        }
-                        else {
-                            vents.push({ x: maxX, y: maxY, value: 1 });
-                        }
-                        maxX--;
-                    }
-                    maxY--;
+            let rangeX = range(entries[i].x, entries[i + 1].x)
+            let rangeY = range(entries[i].y, entries[i + 1].y)
+            rangeX.forEach((val, index) => {
+                let vent = vents.find(vent => vent.x === val && vent.y === rangeY[index]);
+                if (vent) {
+                    vent.value++
+                } 
+                else {
+                    vents.push({ x: val, y: rangeY[index], value: 1 })
                 }
-            }
-            //TODO x===y
-            else if (entries[i].x === entries[i + 1].y && entries[i].y === entries[i + 1].x) {
-                let minX = Math.min(entries[i].x, entries[i + 1].x);
-                for (minX; minX < maxX; minX++) {
-                    for (maxY; maxY >= Math.min(entries[i].y, entries[i + 1].y); maxY--) {
-                        let vent = vents.find(vent => vent.x === minX && vent.y === maxY);
-                        if (vent) {
-                            vent.value++
-                        }
-                        else {
-                            vents.push({ x: minX, y: maxY, value: 1 });
-                        }
-                        minX++;
-                    }
-                }
-            }
+            });
         }
     }
     const dangerousVents = vents.filter(vent => vent.value >= 2);
