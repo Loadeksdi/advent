@@ -1,28 +1,30 @@
 const fs = require('fs');
+const lanternfish = fs.readFileSync('day6/input.txt').toString().split(",");
 
-const lanternfishs = fs.readFileSync('day6/input.txt').toString().split(",");
-
-let numbersLanternfishs = lanternfishs.map(fish => Number(fish));
+const fishesPerState = new Map();
+for (let state = 0; state <= 8; state++) {
+    fishesPerState.set(state, lanternfish.filter(fish => fish === state.toString()).length);
+}
 
 const simulateLanternfishsEvolution = (days) => {
-    let newFishes = 0;
     for (let i = 0; i < days; i++) {
-        newFishes = numbersLanternfishs.filter(fish => fish === 0).length;
-        numbersLanternfishs = numbersLanternfishs.map(fish => {
-            if (fish > 0) {
-                fish--;
-            }
-            else {
-                fish = 6;
-            }
-            return fish;
-        });
-        if (newFishes > 0) {
-            numbersLanternfishs.push(...new Array(newFishes).fill(8));
-        }
+        let val = fishesPerState.get(8);
+        let val2 = fishesPerState.get(6);
+        fishesPerState.set(6, fishesPerState.get(7) + fishesPerState.get(0));
+        fishesPerState.set(8, fishesPerState.get(0));
+        fishesPerState.set(0, fishesPerState.get(1));
+        fishesPerState.set(1, fishesPerState.get(2));
+        fishesPerState.set(2, fishesPerState.get(3));
+        fishesPerState.set(3, fishesPerState.get(4));
+        fishesPerState.set(4, fishesPerState.get(5));
+        fishesPerState.set(5, val2);
+        fishesPerState.set(7, val);
     }
-    return numbersLanternfishs;
+    let result = 0;
+    fishesPerState.forEach(fish => {
+        result += fish
+    });
+    return result;
 };
 
-console.log(simulateLanternfishsEvolution(9));
-
+console.log(simulateLanternfishsEvolution(256));

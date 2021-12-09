@@ -1,32 +1,78 @@
+#include <stdlib.h>
+#include <stdio.h>
 
-unsigned long simulateLanternfishsEvolution (int days, char* fishes){
-    unsigned long newFishes = 0;
-    for (int i = 0; i < days; i++) {
-        unsigned long cpt = 0;
-        for (int j = 0; j < len(fishes); j++){
-            if (fishes[j] == 0){
-                cpt++;
-            }
-        }
-        newFishes = cpt;
-        for (unsigned long k = 0; k < len(fishes);k++){
-            if (fishes[i] > 0){
-                fishes[i]--;
-            }
-            else {
-                fishes[i] = 6;
-            }
-        }
-        if (newFishes > 0) {
-            numbersLanternfishs.push(...new Array(newFishes).fill(8));
-        }
+int *handleFileParsing()
+{
+    FILE *fp;
+    fp = fopen("input.txt", "r");
+    int iter;
+    int *fishes = (int *)malloc(301 * sizeof(int));
+    for (iter = 0; iter < 300; iter++)
+    {
+        fscanf(fp, "%d,", &fishes[iter]);
     }
+    fclose(fp);
+    fishes[iter] = -1;
     return fishes;
 }
 
+unsigned long long simulateLanternfishsEvolution(int days)
+{
+    int *fishes = handleFileParsing();
+    unsigned long long newFishes = 0;
+    for (int i = 0; i < days; i++)
+    {
+        unsigned long long cpt = 0;
+        unsigned long long j = 0;
+        while (fishes[j] != -1)
+        {
+            if (fishes[j] == 0)
+            {
+                cpt++;
+            }
+            j++;
+        }
+        newFishes = cpt;
+        unsigned long long k = 0;
+        while (fishes[k] != -1)
+        {
+            if (fishes[i] > 0)
+            {
+                fishes[i]--;
+            }
+            else
+            {
+                fishes[i] = 6;
+            }
+            k++;
+        }
+        if (newFishes > 0)
+        {
+            while (fishes[k] != -1)
+            {
+                k++;
+            }
+            fishes = realloc(fishes, ((k + newFishes) * sizeof(int)));
+            unsigned long long l = 0;
+            while (l < newFishes)
+            {
+                fishes[k + l] = 8;
+                l++;
+            }
+            fishes[k + l] = -1;
+        }
+    }
+    unsigned long long finalLength = 0;
+    while (fishes[finalLength] != -1)
+    {
+        finalLength++;
+    }
+    free(fishes);
+    return finalLength;
+}
 
-int main(){
-    char fishes[] = {2,1,2,1,5,1,5,1,2,2,1,1,5,1,4,4,4,3,1,2,2,3,4,1,1,5,1,1,4,2,5,5,5,1,1,4,5,4,1,1,4,2,1,4,1,2,2,5,1,1,5,1,1,3,4,4,1,2,3,1,5,5,4,1,4,1,2,1,5,1,1,1,3,4,1,1,5,1,5,1,1,5,1,1,4,3,2,4,1,4,1,5,3,3,1,5,1,3,1,1,4,1,4,5,2,3,1,1,1,1,3,1,2,1,5,1,1,5,1,1,1,1,4,1,4,3,1,5,1,1,5,4,4,2,1,4,5,1,1,3,3,1,1,4,2,5,5,2,4,1,4,5,4,5,3,1,4,1,5,2,4,5,3,1,3,2,4,5,4,4,1,5,1,5,1,2,2,1,4,1,1,4,2,2,2,4,1,1,5,3,1,1,5,4,4,1,5,1,3,1,3,2,2,1,1,4,1,4,1,2,2,1,1,3,5,1,2,1,3,1,4,5,1,3,4,1,1,1,1,4,3,3,4,5,1,1,1,1,1,2,4,5,3,4,2,1,1,1,3,3,1,4,1,1,4,2,1,5,1,1,2,3,4,2,5,1,1,1,5,1,1,4,1,2,4,1,1,2,4,3,4,2,3,1,1,2,1,5,4,2,3,5,1,2,3,1,2,2,1,4};
-    simulateLanternfishsEvolution(80, fishes);
+int main()
+{
+    printf("Value is %llu", simulateLanternfishsEvolution(80));
     return 0;
 }
